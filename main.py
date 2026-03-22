@@ -6,6 +6,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from typing import Optional
 from dotenv import load_dotenv
 
+import libsql_experimental as libsql  # noqa: F401  (registers sqlite+libsql dialect)
 import time
 import os
 
@@ -127,7 +128,8 @@ class Profile(SQLModel, table=True):
 TURSO_URL   = os.environ.get("TURSO_DATABASE_URL")
 TURSO_TOKEN = os.environ.get("TURSO_AUTH_TOKEN")
 if TURSO_URL and TURSO_TOKEN:
-    sqlite_url = f"libsql+aiohybrid://{TURSO_URL}?authToken={TURSO_TOKEN}"
+    host       = TURSO_URL.replace("libsql://", "")
+    sqlite_url = f"sqlite+libsql://{host}?authToken={TURSO_TOKEN}&secure=true"
     engine     = create_engine(sqlite_url, connect_args={"check_same_thread": False})
 else:
     sqlite_url = "sqlite:///database.db"
@@ -1457,4 +1459,5 @@ def delete_profile(profile_id):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=4500, debug=True)
+    port = int(os.environ.get('PORT', 4500))
+    app.run(host='0.0.0.0', port=port, debug=False)

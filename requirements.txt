@@ -5,4 +5,4 @@ sqlalchemy
 authlib
 requests
 python-dotenv
-libsql-experimental
+psycopg2-binary

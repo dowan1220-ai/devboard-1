@@ -6,7 +6,6 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from typing import Optional
 from dotenv import load_dotenv
 
-import libsql_experimental as libsql
 import time
 import os
 
@@ -125,16 +124,13 @@ class Profile(SQLModel, table=True):
     created_at: float = Field(default=0.0)
 
 
-TURSO_URL   = os.environ.get("TURSO_DATABASE_URL")
-TURSO_TOKEN = os.environ.get("TURSO_AUTH_TOKEN")
-if TURSO_URL and TURSO_TOKEN:
-    def _turso_creator():
-        conn = libsql.connect(database="local.db", sync_url=TURSO_URL, auth_token=TURSO_TOKEN)
-        conn.sync()
-        return conn
-    engine = create_engine("sqlite+pysqlite:///", creator=_turso_creator, connect_args={"check_same_thread": False})
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///database.db")
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+if "sqlite" in DATABASE_URL:
+    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 else:
-    engine = create_engine("sqlite:///database.db")
+    engine = create_engine(DATABASE_URL)
 
 with app.app_context():
     SQLModel.metadata.create_all(engine)

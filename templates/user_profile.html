@@ -255,7 +255,8 @@
         // 프로필 DM 버튼
         const profileDmBtn = document.getElementById('profileDmBtn');
         if (profileDmBtn) {
-            profileDmBtn.addEventListener('click', () => {
+            profileDmBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 window.DM.openChat(targetId, nick);
             });
         }

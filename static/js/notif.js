@@ -89,13 +89,22 @@
                 ? `<b>${escHtml(n.sender_nickname)}</b>님이 프로필을 조회했습니다`
                 : `<b>${escHtml(n.sender_nickname)}</b>님이 구인 신청을 보냈습니다`;
             row.className = `notif-panel-row${n.is_read ? '' : ' notif-panel-unread'}`;
+            if (!isView) row.style.cursor = 'pointer';
             row.innerHTML = `
                 <div class="notif-panel-icon">${icon}</div>
                 <div class="notif-panel-info">
                     <div class="notif-panel-msg">${msg}</div>
                     <div class="notif-panel-time">${timeAgo(n.created_at)}</div>
                 </div>
+                ${!isView ? '<div style="font-size:11px;color:#888;margin-top:2px;">💬 클릭하여 메시지 보내기</div>' : ''}
             `;
+            if (!isView) {
+                row.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closePanel();
+                    if (window.DM) window.DM.openChat(n.sender_id, n.sender_nickname);
+                });
+            }
             body.appendChild(row);
         });
     }

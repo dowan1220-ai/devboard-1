@@ -682,6 +682,15 @@ function createTeamCard(team) {
     if (manageBtn) {
         manageBtn.addEventListener('click', () => openManageModal(team));
     }
+    // 팀장 또는 수락된 팀원: 카드 클릭 → 그룹 채팅
+    if (team.is_mine || team.my_status === 'accepted') {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('button')) return;
+            e.stopPropagation();
+            window.openGroupChat(team.id);
+        });
+    }
     return card;
 }
 
@@ -857,3 +866,95 @@ if (boardSearchClear) {
 
 initPresets();
 loadProfiles();
+
+// ─── 팀 그룹 채팅 ───
+(function () {
+    let groupTeamId = null;
+    let groupPollTimer = null;
+
+    function timeAgo(ts) {
+        const diff = Math.floor(Date.now() / 1000 - ts);
+        if (diff < 60)    return '방금 전';
+        if (diff < 3600)  return Math.floor(diff / 60) + '분 전';
+        return Math.floor(diff / 3600) + '시간 전';
+    }
+
+    async function openGroupChat(teamId) {
+        groupTeamId = teamId;
+        document.getElementById('groupChatOverlay').classList.remove('hidden');
+        document.getElementById('groupChatBody').innerHTML = '<div style="text-align:center;color:#aaa;padding:20px;">불러오는 중...</div>';
+        await loadGroupMessages();
+        startGroupPoll();
+    }
+
+    function closeGroupChat() {
+        document.getElementById('groupChatOverlay').classList.add('hidden');
+        groupTeamId = null;
+        stopGroupPoll();
+    }
+
+    async function loadGroupMessages() {
+        if (!groupTeamId) return;
+        try {
+            const res  = await fetch(`/api/teams/${groupTeamId}/messages`);
+            const data = await res.json();
+            if (data.error) return;
+            document.getElementById('groupChatTitle').textContent = `💬 ${data.team_name}`;
+            // 멤버 목록
+            const memberList = document.getElementById('groupMemberList');
+            memberList.innerHTML = '<div style="font-weight:700;color:#888;margin-bottom:8px;">팀원</div>' +
+                data.members.map(m => `<div style="padding:4px 0;color:#444;word-break:break-all;">${escapeHtml(m.display_name)}</div>`).join('');
+            // 메시지
+            const body = document.getElementById('groupChatBody');
+            const atBottom = body.scrollHeight - body.scrollTop <= body.clientHeight + 80;
+            if (!data.messages.length) {
+                body.innerHTML = '<div style="text-align:center;color:#aaa;padding:20px;">첫 메시지를 보내보세요!</div>';
+                return;
+            }
+            body.innerHTML = '';
+            data.messages.forEach(msg => {
+                const div = document.createElement('div');
+                div.style.cssText = `display:flex;flex-direction:column;align-items:${msg.is_mine ? 'flex-end' : 'flex-start'};margin-bottom:8px;`;
+                div.innerHTML = `
+                    ${!msg.is_mine ? `<div style="font-size:11px;color:#888;margin-bottom:2px;">${escapeHtml(msg.sender_nickname)}</div>` : ''}
+                    <div style="max-width:80%;padding:8px 12px;border-radius:${msg.is_mine ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};background:${msg.is_mine ? '#667eea' : '#f1f3f5'};color:${msg.is_mine ? '#fff' : '#222'};font-size:14px;">${escapeHtml(msg.message)}</div>
+                    <div style="font-size:10px;color:#ccc;margin-top:2px;">${timeAgo(msg.created_at)}</div>
+                `;
+                body.appendChild(div);
+            });
+            if (atBottom) body.scrollTop = body.scrollHeight;
+        } catch {}
+    }
+
+    async function sendGroupMessage() {
+        const input = document.getElementById('groupChatInput');
+        const msg = input.value.trim();
+        if (!msg || !groupTeamId) return;
+        input.value = '';
+        const fd = new FormData();
+        fd.append('message', msg);
+        try {
+            await fetch(`/api/teams/${groupTeamId}/messages`, { method: 'POST', body: fd });
+            await loadGroupMessages();
+        } catch {}
+    }
+
+    function startGroupPoll() {
+        stopGroupPoll();
+        groupPollTimer = setInterval(() => { if (groupTeamId) loadGroupMessages(); }, 3000);
+    }
+    function stopGroupPoll() {
+        if (groupPollTimer) { clearInterval(groupPollTimer); groupPollTimer = null; }
+    }
+
+    document.getElementById('groupChatClose').addEventListener('click', closeGroupChat);
+    document.getElementById('groupChatSend').addEventListener('click', sendGroupMessage);
+    document.getElementById('groupChatInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); sendGroupMessage(); }
+    });
+    document.getElementById('groupChatOverlay').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('groupChatOverlay')) closeGroupChat();
+    });
+
+    window.openGroupChat = openGroupChat;
+})();

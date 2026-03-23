@@ -1638,6 +1638,17 @@ body.dark .bio-textarea::placeholder { color: #555 !important; }
 .dark .site-footer a { color: #666; }
 .dark .site-footer a:hover { color: #a78bfa; }
 
+@media (max-width: 768px) {
+    .topbar-nav { display: none; }
+    .board-tabs { gap: 4px; padding: 0 12px; }
+    .board-tab { padding: 10px 12px; font-size: 13px; }
+    .tab-sub { display: none; }
+    .page-content { padding: 12px; }
+    .modal { max-width: 96vw; margin: 0 8px; }
+    .dm-panel { width: 100vw; right: 0; border-radius: 16px 16px 0 0; bottom: 0; top: auto; height: 70vh; }
+    .notif-panel { width: 100vw; right: 0; }
+}
+
 @media (max-width: 520px) {
     .cards-grid {
         grid-template-columns: 1fr;
@@ -1648,4 +1659,8 @@ body.dark .bio-textarea::placeholder { color: #555 !important; }
     .topbar {
         padding: 12px 16px;
     }
+    .welcome { display: none; }
+    .topbar-right { gap: 4px; }
+    .admin-link-btn, .settings-btn { font-size: 12px; padding: 5px 8px; }
+    .logout-btn { font-size: 12px; padding: 5px 8px; }
 }

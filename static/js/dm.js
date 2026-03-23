@@ -184,7 +184,7 @@
 
         if (dmBtn)   dmBtn.addEventListener('click',  () => { isOpen ? closePanel() : openPanel(true); });
         if (closeBtn) closeBtn.addEventListener('click', closePanel);
-        if (backBtn)  backBtn.addEventListener('click',  switchToList);
+        if (backBtn)  backBtn.addEventListener('click',  (e) => { e.stopPropagation(); switchToList(); });
         if (sendBtn)  sendBtn.addEventListener('click',  sendMsg);
         if (input)    input.addEventListener('keydown', e => {
             if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); sendMsg(); }

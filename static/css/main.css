@@ -901,3 +901,19 @@ body.dark .footer {
 .dark .site-footer { border-top-color: rgba(255,255,255,0.08); }
 .dark .site-footer a { color: #666; }
 .dark .site-footer a:hover { color: #a78bfa; }
+
+@media (max-width: 768px) {
+    .topbar-nav { display: none; }
+    .topbar { padding: 10px 16px; }
+    .topbar-right { gap: 4px; }
+    .welcome { display: none; }
+    .dm-panel { width: 100vw; right: 0; border-radius: 16px 16px 0 0; bottom: 0; top: auto; height: 70vh; }
+    .notif-panel { width: 100vw; right: 0; }
+    .main-buttons { gap: 10px; }
+    .main-btn { padding: 20px 16px; min-width: 130px; }
+}
+
+@media (max-width: 520px) {
+    .main-btn { min-width: 100px; font-size: 14px; }
+    .admin-link-btn, .settings-btn, .logout-btn { font-size: 12px; padding: 5px 8px; }
+}

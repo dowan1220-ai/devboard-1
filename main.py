@@ -124,6 +124,15 @@ class Profile(SQLModel, table=True):
     created_at: float = Field(default=0.0)
 
 
+class GroupMessage(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    team_id: int
+    sender_id: str
+    sender_nickname: str
+    message: str = Field(default='')
+    created_at: float = Field(default=0.0)
+
+
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///database.db")
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
@@ -305,7 +314,10 @@ def set_nickname_submit():
 def home():
     show_toast = session.pop('show_login_toast', False)
     nickname = session.get('nickname', session.get('user_id', '게스트'))
-    return render_template('main.html', user_id=nickname, show_toast=show_toast, is_admin=check_admin(), raw_user_id=session.get('user_id',''))
+    with Session(engine) as db_session:
+        owner = db_session.exec(select(User).where(User.is_owner == True)).first()
+        admin_discord = owner.discord_id if owner and owner.discord_id else None
+    return render_template('main.html', user_id=nickname, show_toast=show_toast, is_admin=check_admin(), raw_user_id=session.get('user_id',''), admin_discord=admin_discord)
 
 @app.route('/logout')
 def logout():
@@ -1453,6 +1465,98 @@ def delete_profile(profile_id):
         db_session.delete(profile)
         db_session.commit()
     return {"success": True}
+
+
+@app.route('/api/teams/<int:team_id>/messages', methods=['GET'])
+def get_group_messages(team_id):
+    if 'user_id' not in session:
+        return {"error": "Unauthorized"}, 401
+    current_user = session['user_id']
+    with Session(engine) as db_session:
+        team = db_session.get(Team, team_id)
+        if not team:
+            return {"error": "팀을 찾을 수 없습니다."}, 404
+        # 팀 멤버 확인
+        member = db_session.exec(
+            select(TeamMember).where(
+                TeamMember.team_id == team_id,
+                TeamMember.user_id == current_user,
+                TeamMember.status == 'accepted'
+            )
+        ).first()
+        is_leader = team.leader_id == current_user
+        if not member and not is_leader:
+            return {"error": "팀 멤버만 볼 수 있습니다."}, 403
+        messages = db_session.exec(
+            select(GroupMessage).where(GroupMessage.team_id == team_id)
+            .order_by(GroupMessage.created_at)
+        ).all()
+        members = db_session.exec(
+            select(TeamMember).where(
+                TeamMember.team_id == team_id,
+                TeamMember.status == 'accepted'
+            )
+        ).all()
+        members_data = [{"user_id": m.user_id, "display_name": m.display_name} for m in members]
+        # 팀장 추가
+        leader_user = db_session.exec(select(User).where(User.username == team.leader_id)).first()
+        leader_name = leader_user.nickname if leader_user and leader_user.nickname else team.leader_name
+        members_data.insert(0, {"user_id": team.leader_id, "display_name": leader_name + " 👑"})
+    return {
+        "messages": [
+            {
+                "id": m.id,
+                "sender_id": m.sender_id,
+                "sender_nickname": m.sender_nickname,
+                "message": m.message,
+                "created_at": m.created_at,
+                "is_mine": m.sender_id == current_user
+            } for m in messages
+        ],
+        "members": members_data,
+        "team_name": team.name
+    }
+
+
+@app.route('/api/teams/<int:team_id>/messages', methods=['POST'])
+def send_group_message(team_id):
+    if 'user_id' not in session:
+        return {"error": "Unauthorized"}, 401
+    current_user = session['user_id']
+    message_text = request.form.get('message', '').strip()
+    if not message_text:
+        return {"error": "메시지를 입력해주세요."}, 400
+    with Session(engine) as db_session:
+        team = db_session.get(Team, team_id)
+        if not team:
+            return {"error": "팀을 찾을 수 없습니다."}, 404
+        member = db_session.exec(
+            select(TeamMember).where(
+                TeamMember.team_id == team_id,
+                TeamMember.user_id == current_user,
+                TeamMember.status == 'accepted'
+            )
+        ).first()
+        is_leader = team.leader_id == current_user
+        if not member and not is_leader:
+            return {"error": "팀 멤버만 메시지를 보낼 수 있습니다."}, 403
+        user = db_session.exec(select(User).where(User.username == current_user)).first()
+        nickname = user.nickname if user and user.nickname else current_user
+        msg = GroupMessage(
+            team_id=team_id,
+            sender_id=current_user,
+            sender_nickname=nickname,
+            message=message_text,
+            created_at=time.time()
+        )
+        db_session.add(msg)
+        db_session.commit()
+        db_session.refresh(msg)
+    return {"success": True, "message": {
+        "id": msg.id, "sender_id": msg.sender_id,
+        "sender_nickname": msg.sender_nickname,
+        "message": msg.message, "created_at": msg.created_at, "is_mine": True
+    }}
 
 
 if __name__ == '__main__':

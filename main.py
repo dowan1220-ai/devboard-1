@@ -139,7 +139,11 @@ if DATABASE_URL.startswith("postgres://"):
 if "sqlite" in DATABASE_URL:
     engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 else:
-    engine = create_engine(DATABASE_URL)
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,    # 절전 후 재연결 시 끊긴 커넥션 자동 교체
+        pool_recycle=300,      # 5분마다 커넥션 갱신
+    )
 
 with app.app_context():
     SQLModel.metadata.create_all(engine)
@@ -872,42 +876,45 @@ def get_profiles():
         return {"error": "Unauthorized"}, 401
     current_user = session['user_id']
     ptype = request.args.get('type', 'recruit')
-    with Session(engine) as db_session:
-        profiles = db_session.exec(
-            select(Profile)
-            .where(Profile.post_type == ptype)
-            .order_by(Profile.created_at)
-        ).all()
-        users = db_session.exec(select(User)).all()
-        interests = db_session.exec(
-            select(RecruitInterest).where(RecruitInterest.sender_id == current_user)
-        ).all()
-    nickname_map = {u.username: (u.nickname or u.username) for u in users}
-    sent_set = {i.profile_id for i in interests}
-    mine = []
-    others = []
-    for p in profiles:
-        data = {
-            "id": p.id,
-            "name": p.name,
-            "nickname": nickname_map.get(p.user_id, p.user_id),
-            "bio": p.bio or '',
-            "class_number": p.class_number,
-            "major": p.major,
-            "past_languages": [l.strip() for l in p.past_languages.split(',') if l.strip()],
-            "current_languages": [l.strip() for l in p.current_languages.split(',') if l.strip()],
-            "profile_image": p.profile_image,
-            "post_type": p.post_type,
-            "dev_field": p.dev_field,
-            "is_mine": p.user_id == current_user,
-            "interest_sent": p.id in sent_set,
-            "owner_id": p.user_id
-        }
-        if p.user_id == current_user:
-            mine.append(data)
-        else:
-            others.append(data)
-    return {"profiles": mine + others}
+    try:
+        with Session(engine) as db_session:
+            profiles = db_session.exec(
+                select(Profile)
+                .where(Profile.post_type == ptype)
+                .order_by(Profile.created_at)
+            ).all()
+            users = db_session.exec(select(User)).all()
+            interests = db_session.exec(
+                select(RecruitInterest).where(RecruitInterest.sender_id == current_user)
+            ).all()
+        nickname_map = {u.username: (u.nickname or u.username) for u in users}
+        sent_set = {i.profile_id for i in interests}
+        mine = []
+        others = []
+        for p in profiles:
+            data = {
+                "id": p.id,
+                "name": p.name,
+                "nickname": nickname_map.get(p.user_id, p.user_id),
+                "bio": p.bio or '',
+                "class_number": p.class_number,
+                "major": p.major,
+                "past_languages": [l.strip() for l in p.past_languages.split(',') if l.strip()],
+                "current_languages": [l.strip() for l in p.current_languages.split(',') if l.strip()],
+                "profile_image": p.profile_image,
+                "post_type": p.post_type,
+                "dev_field": p.dev_field,
+                "is_mine": p.user_id == current_user,
+                "interest_sent": p.id in sent_set,
+                "owner_id": p.user_id
+            }
+            if p.user_id == current_user:
+                mine.append(data)
+            else:
+                others.append(data)
+        return {"profiles": mine + others}
+    except Exception as e:
+        return {"error": "데이터를 불러오는 중 오류가 발생했습니다.", "profiles": []}, 500
 
 
 @app.route('/api/profiles', methods=['POST'])
@@ -971,37 +978,40 @@ def get_teams():
     if 'user_id' not in session:
         return {"error": "Unauthorized"}, 401
     current_user = session['user_id']
-    with Session(engine) as db_session:
-        teams = db_session.exec(select(Team).order_by(Team.created_at)).all()
-        members_all = db_session.exec(select(TeamMember)).all()
-        users = db_session.exec(select(User)).all()
-    # 실시간 닉네임 맵 (user_id → 현재 닉네임)
-    nick_map = {u.username: (u.nickname or u.username) for u in users}
-    mem_map = {}
-    for m in members_all:
-        mem_map.setdefault(m.team_id, []).append(m)
-    result = []
-    for t in teams:
-        mems = mem_map.get(t.id, [])
-        accepted = [m for m in mems if m.status == 'accepted']
-        pending  = [m for m in mems if m.status == 'pending']
-        my_status = next((m.status for m in mems if m.user_id == current_user), None)
-        result.append({
-            "id": t.id,
-            "name": t.name,
-            "description": t.description,
-            "dev_field": t.dev_field,
-            "max_members": t.max_members,
-            "team_image": t.team_image,
-            "leader_id": t.leader_id,
-            "leader_name": nick_map.get(t.leader_id, t.leader_name),
-            "is_mine": t.leader_id == current_user,
-            "my_status": my_status,
-            "members": [{"id": m.id, "user_id": m.user_id, "display_name": nick_map.get(m.user_id, m.display_name), "status": m.status} for m in accepted],
-            "pending_count": len(pending),
-            "pending_list": [{"id": m.id, "user_id": m.user_id, "display_name": nick_map.get(m.user_id, m.display_name)} for m in pending] if t.leader_id == current_user else [],
-        })
-    return {"teams": result}
+    try:
+        with Session(engine) as db_session:
+            teams = db_session.exec(select(Team).order_by(Team.created_at)).all()
+            members_all = db_session.exec(select(TeamMember)).all()
+            users = db_session.exec(select(User)).all()
+        # 실시간 닉네임 맵 (user_id → 현재 닉네임)
+        nick_map = {u.username: (u.nickname or u.username) for u in users}
+        mem_map = {}
+        for m in members_all:
+            mem_map.setdefault(m.team_id, []).append(m)
+        result = []
+        for t in teams:
+            mems = mem_map.get(t.id, [])
+            accepted = [m for m in mems if m.status == 'accepted']
+            pending  = [m for m in mems if m.status == 'pending']
+            my_status = next((m.status for m in mems if m.user_id == current_user), None)
+            result.append({
+                "id": t.id,
+                "name": t.name,
+                "description": t.description,
+                "dev_field": t.dev_field,
+                "max_members": t.max_members,
+                "team_image": t.team_image,
+                "leader_id": t.leader_id,
+                "leader_name": nick_map.get(t.leader_id, t.leader_name),
+                "is_mine": t.leader_id == current_user,
+                "my_status": my_status,
+                "members": [{"id": m.id, "user_id": m.user_id, "display_name": nick_map.get(m.user_id, m.display_name), "status": m.status} for m in accepted],
+                "pending_count": len(pending),
+                "pending_list": [{"id": m.id, "user_id": m.user_id, "display_name": nick_map.get(m.user_id, m.display_name)} for m in pending] if t.leader_id == current_user else [],
+            })
+        return {"teams": result}
+    except Exception as e:
+        return {"error": "데이터를 불러오는 중 오류가 발생했습니다.", "teams": []}, 500
 
 
 @app.route('/api/teams', methods=['POST'])

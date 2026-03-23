@@ -700,24 +700,31 @@ function createTeamCard(team) {
     return card;
 }
 
-// ─── 로드 ───
-async function loadProfiles() {
+// ─── 로드 (실패 시 1회 자동 재시도) ───
+async function loadProfiles(retry = true) {
     const grid = document.getElementById('cardsGrid');
     grid.innerHTML = '<div class="loading">불러오는 중...</div>';
     try {
         if (currentTab === 'team') {
             const res = await fetch('/api/teams');
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             cachedTeams = (data.teams || []).sort((a, b) => (b.is_mine ? 1 : 0) - (a.is_mine ? 1 : 0));
             renderFiltered();
         } else {
             const res = await fetch(`/api/profiles?type=${currentTab}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             cachedProfiles = data.profiles || [];
             renderFiltered();
         }
     } catch {
-        grid.innerHTML = '<div class="loading">로딩 실패. 새로고침해주세요.</div>';
+        if (retry) {
+            // 서버 절전 후 재연결 지연 등으로 실패한 경우 2초 후 1회 재시도
+            setTimeout(() => loadProfiles(false), 2000);
+        } else {
+            grid.innerHTML = '<div class="loading">로딩 실패. 새로고침해주세요.</div>';
+        }
     }
 }
 

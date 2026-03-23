@@ -549,13 +549,19 @@ function createProfileCard(profile) {
             e.stopPropagation();
             interestBtn.disabled = true;
             interestBtn.textContent = '신청 중...';
-            const res = await fetch(`/api/profiles/${profile.id}/interest`, {method:'POST'});
-            const data = await res.json();
-            if (data.success) {
-                interestBtn.textContent = '✅ 구인 신청 완료';
-                interestBtn.classList.add('sent');
-            } else {
-                alert(data.error || '오류 발생');
+            try {
+                const res = await fetch(`/api/profiles/${profile.id}/interest`, {method:'POST'});
+                const data = await res.json();
+                if (data.success) {
+                    interestBtn.textContent = '✅ 구인 신청 완료';
+                    interestBtn.classList.add('sent');
+                } else {
+                    alert(data.error || '오류가 발생했습니다.');
+                    interestBtn.disabled = false;
+                    interestBtn.textContent = '👋 구인하기';
+                }
+            } catch {
+                alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
                 interestBtn.disabled = false;
                 interestBtn.textContent = '👋 구인하기';
             }

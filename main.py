@@ -1222,7 +1222,11 @@ def recruit_interest(profile_id):
             created_at=time.time()
         )
         db_session.add(notif)
-        db_session.commit()
+        try:
+            db_session.commit()
+        except Exception as e:
+            db_session.rollback()
+            return {"error": "신청 처리 중 오류가 발생했습니다."}, 500
     return {"success": True}
 
 

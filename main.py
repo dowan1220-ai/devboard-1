@@ -399,8 +399,27 @@ def update_nickname():
 def members_page():
     if 'user_id' not in session:
         return redirect(url_for('login_page'))
-    nickname = session.get('nickname', session['user_id'])
-    return render_template('members.html', user_id=nickname, is_admin=check_admin(), raw_user_id=session.get('user_id',''))
+    current_user = session['user_id']
+    nickname = session.get('nickname', current_user)
+
+    init_members = []
+    try:
+        with Session(engine) as db_session:
+            users = db_session.exec(select(User)).all()
+        members = [
+            {"username": u.username, "nickname": u.nickname or u.username, "is_self": u.username == current_user}
+            for u in users
+        ]
+        members.sort(key=lambda u: (0 if u['is_self'] else 1))
+        init_members = members
+    except Exception:
+        pass
+
+    return render_template(
+        'members.html',
+        user_id=nickname, is_admin=check_admin(), raw_user_id=current_user,
+        init_members=json.dumps(init_members, ensure_ascii=False),
+    )
 
 
 @app.route('/api/session-check')

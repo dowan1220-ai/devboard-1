@@ -138,18 +138,16 @@
 
         const COLORS = ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#ff9a56','#a18cd1'];
 
-        async function loadMembers() {
+        const INIT_MEMBERS = {{ init_members | safe }};
+
+        function renderMembers(members) {
             const grid = document.getElementById('membersGrid');
-            try {
-                const res  = await fetch('/api/members');
-                const data = await res.json();
-                const members = (data.members || []).sort((a, b) => (b.is_self ? 1 : 0) - (a.is_self ? 1 : 0));
-                if (!members.length) {
-                    grid.innerHTML = '<div class="members-loading">가입된 멤버가 없습니다</div>';
-                    return;
-                }
-                grid.innerHTML = '';
-                members.forEach((u, i) => {
+            if (!members.length) {
+                grid.innerHTML = '<div class="members-loading">가입된 멤버가 없습니다</div>';
+                return;
+            }
+            grid.innerHTML = '';
+            members.forEach((u, i) => {
                     const card = document.createElement('div');
                     card.className = 'member-card fade-up';
                     card.style.setProperty('--fu-delay', Math.min(i, 10) * 0.05 + 's');
@@ -171,12 +169,26 @@
                     }
                     grid.appendChild(card);
                 });
+        }
+
+        async function loadMembers() {
+            const grid = document.getElementById('membersGrid');
+            try {
+                const res  = await fetch('/api/members');
+                const data = await res.json();
+                const members = (data.members || []).sort((a, b) => (b.is_self ? 1 : 0) - (a.is_self ? 1 : 0));
+                renderMembers(members);
             } catch {
                 grid.innerHTML = '<div class="members-loading">로딩 실패</div>';
             }
         }
 
-        loadMembers();
+        // 서버에서 미리 받은 초기 데이터가 있으면 즉시 렌더링, 없으면 API 호출
+        if (INIT_MEMBERS && INIT_MEMBERS.length > 0) {
+            renderMembers(INIT_MEMBERS);
+        } else {
+            loadMembers();
+        }
 
         // 다크모드
         const darkToggle = document.getElementById('darkToggle');

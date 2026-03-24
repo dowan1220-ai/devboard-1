@@ -628,7 +628,52 @@ def admin_page():
     if not check_admin():
         return redirect(url_for('home'))
     nickname = session.get('nickname', session['user_id'])
-    return render_template('admin.html', user_id=nickname, current_user=session['user_id'], is_superadmin=check_superadmin(), is_owner=check_owner())
+
+    init_notices, init_users, init_messages = [], [], []
+    try:
+        with Session(engine) as db_session:
+            notices  = db_session.exec(select(Notice).order_by(Notice.is_pinned.desc(), Notice.created_at.desc())).all()
+            users    = db_session.exec(select(User)).all()
+            profiles = db_session.exec(select(Profile)).all()
+            teams    = db_session.exec(select(Team)).all()
+            messages = db_session.exec(select(DirectMessage).order_by(DirectMessage.created_at.desc())).all()
+            nick_map = {u.username: (u.nickname or u.username) for u in users}
+
+        init_notices = [
+            {"id": n.id, "title": n.title, "content": n.content,
+             "author_nickname": n.author_nickname, "is_pinned": n.is_pinned,
+             "created_at": n.created_at, "updated_at": n.updated_at}
+            for n in notices
+        ]
+        p_cnt = {}
+        for p in profiles: p_cnt[p.user_id] = p_cnt.get(p.user_id, 0) + 1
+        t_cnt = {}
+        for t in teams:    t_cnt[t.leader_id] = t_cnt.get(t.leader_id, 0) + 1
+        init_users = [
+            {"id": u.id, "username": u.username, "nickname": u.nickname or u.username,
+             "is_admin": u.is_admin, "is_owner": u.is_owner,
+             "is_locked": bool(u.locked_until and time.time() < u.locked_until),
+             "locked_until": u.locked_until, "failed_attempts": u.failed_attempts,
+             "profile_count": p_cnt.get(u.username, 0), "team_count": t_cnt.get(u.username, 0)}
+            for u in users
+        ]
+        init_messages = [
+            {"id": m.id, "sender_id": m.sender_id, "sender_nick": nick_map.get(m.sender_id, m.sender_id),
+             "receiver_id": m.receiver_id, "receiver_nick": nick_map.get(m.receiver_id, m.receiver_id),
+             "message": m.message, "created_at": m.created_at}
+            for m in messages
+        ]
+    except Exception:
+        pass
+
+    return render_template(
+        'admin.html',
+        user_id=nickname, current_user=session['user_id'],
+        is_superadmin=check_superadmin(), is_owner=check_owner(),
+        init_notices=json.dumps(init_notices, ensure_ascii=False),
+        init_users=json.dumps(init_users, ensure_ascii=False),
+        init_messages=json.dumps(init_messages, ensure_ascii=False),
+    )
 
 
 @app.route('/admin/setup', methods=['GET', 'POST'])

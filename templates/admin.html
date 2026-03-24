@@ -212,7 +212,15 @@
         </div>
     </div>
 
-    <script>const CURRENT_ADMIN_ID = {{ current_user | tojson }}; const IS_SUPERADMIN = {{ is_superadmin | tojson }}; const IS_OWNER = {{ is_owner | tojson }};</script>
+    <script>
+        const CURRENT_ADMIN_ID = {{ current_user | tojson }};
+        const IS_SUPERADMIN    = {{ is_superadmin | tojson }};
+        const IS_OWNER         = {{ is_owner | tojson }};
+        // 서버에서 미리 조회한 초기 데이터
+        window.__INIT_NOTICES__  = {{ init_notices | safe }};
+        window.__INIT_USERS__    = {{ init_users | safe }};
+        window.__INIT_MESSAGES__ = {{ init_messages | safe }};
+    </script>
     <script src="/static/js/dm.js"></script>
     <script src="/static/js/admin.js"></script>
     <script>

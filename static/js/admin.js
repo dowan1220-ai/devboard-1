@@ -47,46 +47,57 @@ function hideError(id) {
 let editingNoticeId = null;
 let noticesCache = {};   // id → notice 객체 캐시
 
+function renderNotices(notices) {
+    const list = document.getElementById('noticeList');
+    if (!notices.length) {
+        list.innerHTML = '<div class="notice-empty-admin">📭 아직 공지사항이 없습니다.<br>새 공지를 작성해보세요!</div>';
+        return;
+    }
+    noticesCache = {};
+    list.innerHTML = '';
+    notices.forEach(n => {
+        noticesCache[n.id] = n;
+        const item = document.createElement('div');
+        item.className = 'notice-item';
+        const actionsHtml = IS_SUPERADMIN
+            ? `<div class="notice-item-actions">
+                <button class="btn-neutral" data-notice-id="${n.id}">✏️ 수정</button>
+                <button class="btn-danger"  data-delete-id="${n.id}">🗑 삭제</button>
+               </div>`
+            : '';
+        item.innerHTML = `
+            <div class="notice-pin-icon ${n.is_pinned ? 'pinned' : ''}">📌</div>
+            <div class="notice-item-body">
+                <div class="notice-item-title">
+                    ${n.is_pinned ? '<span class="notice-pin-badge">고정</span>' : ''}
+                    ${escHtml(n.title)}
+                </div>
+                <div class="notice-item-content">${escHtml(n.content)}</div>
+                <div class="notice-item-meta">${escHtml(n.author_nickname)} · ${timeStr(n.created_at)}${n.updated_at > n.created_at + 1 ? ' · (수정됨)' : ''}</div>
+            </div>
+            ${actionsHtml}
+        `;
+        if (IS_SUPERADMIN) {
+            item.querySelector('[data-notice-id]').addEventListener('click', () => openEditNotice(n.id));
+            item.querySelector('[data-delete-id]').addEventListener('click', () => deleteNotice(n.id));
+        }
+        list.appendChild(item);
+    });
+}
+
 async function loadNotices() {
+    if (window.__INIT_NOTICES__) {
+        const notices = window.__INIT_NOTICES__;
+        window.__INIT_NOTICES__ = null;
+        renderNotices(notices);
+        return;
+    }
     const list = document.getElementById('noticeList');
     list.innerHTML = '<div class="admin-loading">불러오는 중...</div>';
     try {
         const res  = await fetch('/api/notices');
         const data = await res.json();
-        if (!data.notices.length) {
-            list.innerHTML = '<div class="notice-empty-admin">📭 아직 공지사항이 없습니다.<br>새 공지를 작성해보세요!</div>';
-            return;
-        }
-        noticesCache = {};
-        list.innerHTML = '';
-        data.notices.forEach(n => {
-            noticesCache[n.id] = n;   // 캐시에 저장
-            const item = document.createElement('div');
-            item.className = 'notice-item';
-            const actionsHtml = IS_SUPERADMIN
-                ? `<div class="notice-item-actions">
-                    <button class="btn-neutral" data-notice-id="${n.id}">✏️ 수정</button>
-                    <button class="btn-danger"  data-delete-id="${n.id}">🗑 삭제</button>
-                   </div>`
-                : '';
-            item.innerHTML = `
-                <div class="notice-pin-icon ${n.is_pinned ? 'pinned' : ''}">📌</div>
-                <div class="notice-item-body">
-                    <div class="notice-item-title">
-                        ${n.is_pinned ? '<span class="notice-pin-badge">고정</span>' : ''}
-                        ${escHtml(n.title)}
-                    </div>
-                    <div class="notice-item-content">${escHtml(n.content)}</div>
-                    <div class="notice-item-meta">${escHtml(n.author_nickname)} · ${timeStr(n.created_at)}${n.updated_at > n.created_at + 1 ? ' · (수정됨)' : ''}</div>
-                </div>
-                ${actionsHtml}
-            `;
-            if (IS_SUPERADMIN) {
-                item.querySelector('[data-notice-id]').addEventListener('click', () => openEditNotice(n.id));
-                item.querySelector('[data-delete-id]').addEventListener('click', () => deleteNotice(n.id));
-            }
-            list.appendChild(item);
-        });
+        renderNotices(data.notices || []);
     } catch {
         list.innerHTML = '<div class="admin-loading">로딩 실패</div>';
     }
@@ -165,6 +176,13 @@ async function deleteNotice(id) {
 let allUsers = [];
 
 async function loadUsers() {
+    if (window.__INIT_USERS__) {
+        allUsers = window.__INIT_USERS__;
+        window.__INIT_USERS__ = null;
+        document.getElementById('userCount').textContent = allUsers.length;
+        renderUsers(allUsers);
+        return;
+    }
     const tbody = document.getElementById('userTableBody');
     tbody.innerHTML = '<tr><td colspan="7" class="admin-loading">불러오는 중...</td></tr>';
     try {
@@ -287,41 +305,52 @@ async function deleteUser(uid, nickname) {
 // ════════════════════════════════
 //  가입자 보기
 // ════════════════════════════════
+const MEMBER_COLORS = ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#ff9a56','#a18cd1'];
+function renderMemberCards(users, grid) {
+    if (!users.length) {
+        grid.innerHTML = '<div class="admin-loading">가입된 멤버가 없습니다</div>';
+        return;
+    }
+    grid.innerHTML = '';
+    users.forEach(u => {
+        const card = document.createElement('div');
+        card.className = 'member-card';
+        const color = MEMBER_COLORS[u.nickname.charCodeAt(0) % MEMBER_COLORS.length];
+        const isSelf = u.username === CURRENT_ADMIN_ID;
+        card.innerHTML = `
+            <div class="member-card-avatar" style="background:${color};">${escHtml(u.nickname.charAt(0))}</div>
+            <div class="member-card-info">
+                <div class="member-card-name">${escHtml(u.nickname)}${isSelf ? ' <span class="self-tag">나</span>' : ''}</div>
+                <div class="member-card-id">${escHtml(u.username)}</div>
+                ${u.is_locked ? '<div class="member-card-locked">🔒 잠금</div>' : ''}
+            </div>
+            ${!isSelf ? `<div class="member-dm-hint">💬 클릭해서 대화하기</div>` : ''}
+        `;
+        if (!isSelf) {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', () => window.DM.openChat(u.username, u.nickname));
+        }
+        grid.appendChild(card);
+    });
+}
+
 async function loadMembers() {
     const grid = document.getElementById('membersGrid');
+    // __INIT_USERS__ 또는 이미 로드된 allUsers 재사용
+    if (window.__INIT_USERS__) {
+        renderMemberCards(window.__INIT_USERS__, grid);
+        window.__INIT_USERS__ = null;
+        return;
+    }
+    if (allUsers.length) {
+        renderMemberCards(allUsers, grid);
+        return;
+    }
     grid.innerHTML = '<div class="admin-loading">불러오는 중...</div>';
     try {
         const res  = await fetch('/api/admin/users');
         const data = await res.json();
-        const users = data.users || [];
-        if (!users.length) {
-            grid.innerHTML = '<div class="admin-loading">가입된 멤버가 없습니다</div>';
-            return;
-        }
-        grid.innerHTML = '';
-        const COLORS = ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#ff9a56','#a18cd1'];
-        users.forEach(u => {
-            const card = document.createElement('div');
-            card.className = 'member-card';
-            const color = COLORS[u.nickname.charCodeAt(0) % COLORS.length];
-            const isSelf = u.username === CURRENT_ADMIN_ID;
-            card.innerHTML = `
-                <div class="member-card-avatar" style="background:${color};">${escHtml(u.nickname.charAt(0))}</div>
-                <div class="member-card-info">
-                    <div class="member-card-name">${escHtml(u.nickname)}${isSelf ? ' <span class="self-tag">나</span>' : ''}</div>
-                    <div class="member-card-id">${escHtml(u.username)}</div>
-                    ${u.is_locked ? '<div class="member-card-locked">🔒 잠금</div>' : ''}
-                </div>
-                ${!isSelf ? `<div class="member-dm-hint">💬 클릭해서 대화하기</div>` : ''}
-            `;
-            if (!isSelf) {
-                card.style.cursor = 'pointer';
-                card.addEventListener('click', () => {
-                    window.DM.openChat(u.username, u.nickname);
-                });
-            }
-            grid.appendChild(card);
-        });
+        renderMemberCards(data.users || [], grid);
     } catch {
         grid.innerHTML = '<div class="admin-loading">로딩 실패</div>';
     }
@@ -331,6 +360,13 @@ async function loadMembers() {
 let allMessages = [];
 
 async function loadMessages() {
+    if (window.__INIT_MESSAGES__) {
+        allMessages = window.__INIT_MESSAGES__;
+        window.__INIT_MESSAGES__ = null;
+        document.getElementById('msgCount').textContent = allMessages.length;
+        renderMessages(allMessages);
+        return;
+    }
     const tbody = document.getElementById('msgTableBody');
     tbody.innerHTML = '<tr><td colspan="5" class="admin-loading">불러오는 중...</td></tr>';
     try {

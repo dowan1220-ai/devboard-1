@@ -1,3 +1,40 @@
+/* ════════════════════════════════════════
+   디자인 토큰 (색상·반경·그림자 통일)
+   ════════════════════════════════════════ */
+:root {
+    /* 브랜드 색상 */
+    --primary:        #5b5ef7;
+    --primary-light:  rgba(91, 94, 247, 0.08);
+    --primary-hover:  rgba(91, 94, 247, 0.16);
+    --primary-muted:  rgba(91, 94, 247, 0.5);
+
+    /* 상태 색상 */
+    --success:        #27ae60;
+    --success-light:  rgba(39, 174, 96, 0.09);
+    --warning:        #d4880a;
+    --warning-light:  rgba(212, 136, 10, 0.09);
+    --danger:         #e05555;
+    --danger-light:   rgba(224, 85, 85, 0.10);
+
+    /* 중립 */
+    --text-primary:   #222;
+    --text-secondary: #555;
+    --text-muted:     #999;
+    --border:         rgba(0, 0, 0, 0.08);
+
+    /* 반경 */
+    --radius-xs:   6px;
+    --radius-sm:   8px;
+    --radius-md:  12px;
+    --radius-lg:  20px;
+    --radius-full: 9999px;
+
+    /* 카드 */
+    --card-bg:     rgba(255, 255, 255, 0.9);
+    --card-shadow: 0 4px 20px rgba(91, 94, 247, 0.08);
+    --card-hover:  0 12px 36px rgba(91, 94, 247, 0.16);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -39,7 +76,7 @@ body {
     text-decoration: none;
     font-size: 17px;
     font-weight: 900;
-    color: #5b5ef7;
+    color: var(--primary);
     letter-spacing: -0.3px;
     transition: opacity 0.2s;
 }
@@ -83,8 +120,8 @@ body {
 
 .nav-link:hover,
 .nav-link.active {
-    background: rgba(91,94,247,0.1);
-    color: #5b5ef7;
+    background: var(--primary-light);
+    color: var(--primary);
 }
 
 body.dark .nav-link { color: #aaa; }
@@ -99,17 +136,17 @@ body.dark .nav-link.active { background: rgba(120,120,255,0.15); color: #a0a3ff;
 
 .logout-btn {
     text-decoration: none;
-    background-color: rgb(143, 203, 255);
-    color: #333;
+    background: var(--primary-light);
+    color: var(--primary);
     padding: 8px 20px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     font-size: 14px;
     font-weight: bold;
-    transition: background-color 0.2s;
+    transition: background 0.2s;
 }
 
 .logout-btn:hover {
-    background-color: rgb(100, 170, 240);
+    background: var(--primary-hover);
 }
 
 /* ── 알림 벨 ── */
@@ -131,7 +168,7 @@ body.dark .nav-link.active { background: rgba(120,120,255,0.15); color: #a0a3ff;
 .notif-badge {
     position: absolute;
     top: 2px; right: 2px;
-    background: #e05555;
+    background: var(--danger);
     color: #fff;
     font-size: 10px;
     font-weight: bold;
@@ -183,20 +220,20 @@ body.dark .nav-link.active { background: rgba(120,120,255,0.15); color: #a0a3ff;
     margin-top: auto;
     width: 100%;
     padding: 9px;
-    border: 1.5px solid #5b5ef7;
-    border-radius: 12px;
-    background: rgba(91,94,247,0.07);
-    color: #5b5ef7;
+    border: 1.5px solid var(--primary);
+    border-radius: var(--radius-md);
+    background: var(--primary-light);
+    color: var(--primary);
     font-size: 13px;
-    font-weight: bold;
+    font-weight: 700;
     cursor: pointer;
     transition: background 0.2s, opacity 0.2s;
 }
-.recruit-interest-btn:hover { background: rgba(91,94,247,0.14); }
+.recruit-interest-btn:hover { background: var(--primary-hover); }
 .recruit-interest-btn.sent {
-    border-color: #27ae60;
-    background: rgba(39,174,96,0.07);
-    color: #27ae60;
+    border-color: var(--success);
+    background: var(--success-light);
+    color: var(--success);
     cursor: default;
 }
 
@@ -293,11 +330,12 @@ body.dark .board-search-wrap:focus-within {
 
 /* ── 기본 카드 ── */
 .card {
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    padding: 28px 20px;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    padding: 24px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -308,39 +346,40 @@ body.dark .board-search-wrap:focus-within {
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.2);
+    transform: translateY(-4px);
+    box-shadow: var(--card-hover);
 }
 
 /* ── 플러스 카드 ── */
 .card-plus {
-    border: 2.5px dashed rgba(100, 150, 255, 0.45);
+    border: 2px dashed var(--primary-muted);
     background: rgba(255, 255, 255, 0.5);
     cursor: pointer;
     justify-content: center;
 }
 
 .card-plus:hover {
-    background: rgba(255, 255, 255, 0.72);
-    border-color: rgba(100, 150, 255, 0.85);
+    background: rgba(255, 255, 255, 0.78);
+    border-color: var(--primary);
 }
 
 .plus-icon {
-    font-size: 64px;
-    color: rgb(143, 203, 255);
+    font-size: 56px;
+    color: var(--primary);
     line-height: 1;
     font-weight: 200;
+    opacity: 0.6;
 }
 
 .plus-text {
     font-size: 16px;
-    font-weight: bold;
-    color: #555;
+    font-weight: 700;
+    color: var(--text-secondary);
 }
 
 .plus-sub {
     font-size: 13px;
-    color: #999;
+    color: var(--text-muted);
 }
 
 /* ── 내 프로필 뱃지 ── */
@@ -348,14 +387,15 @@ body.dark .board-search-wrap:focus-within {
     position: absolute;
     top: 12px;
     right: 12px;
-    background: linear-gradient(135deg, rgb(143, 203, 255), rgb(100, 170, 240));
+    background: var(--primary);
     color: white;
     font-size: 11px;
-    font-weight: bold;
+    font-weight: 700;
     padding: 3px 10px;
-    border-radius: 20px;
+    border-radius: var(--radius-full);
     transition: transform 0.2s ease;
     z-index: 1;
+    opacity: 0.9;
 }
 
 .card-profile:hover .mine-badge {
@@ -363,7 +403,7 @@ body.dark .board-search-wrap:focus-within {
 }
 
 .card-mine {
-    border: 2px solid rgba(143, 203, 255, 0.6);
+    border: 2px solid rgba(91, 94, 247, 0.35);
 }
 
 /* ── 내 팀 카드 (프로필 카드 스타일) ── */
@@ -383,13 +423,13 @@ body.dark .board-search-wrap:focus-within {
     position: absolute;
     top: 10px;
     right: 10px;
-    background: rgba(255, 80, 80, 0.12);
+    background: var(--danger-light);
     border: none;
     border-radius: 50%;
     width: 26px;
     height: 26px;
     font-size: 12px;
-    color: #e05555;
+    color: var(--danger);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -405,7 +445,7 @@ body.dark .board-search-wrap:focus-within {
 }
 
 .card-delete-btn:hover {
-    background: rgba(255, 80, 80, 0.28);
+    background: rgba(224, 85, 85, 0.28);
 }
 
 /* ── 수정 버튼 ── */
@@ -413,13 +453,13 @@ body.dark .board-search-wrap:focus-within {
     position: absolute;
     top: 10px;
     right: 42px;
-    background: rgba(91, 94, 247, 0.12);
+    background: var(--primary-light);
     border: none;
     border-radius: 50%;
     width: 26px;
     height: 26px;
     font-size: 13px;
-    color: #5b5ef7;
+    color: var(--primary);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -435,17 +475,18 @@ body.dark .board-search-wrap:focus-within {
 }
 
 .card-edit-btn:hover {
-    background: rgba(91, 94, 247, 0.24);
+    background: var(--primary-hover);
 }
 
-/* ── 구인/구직 탭 ── */
+/* ── 구인/구직 탭 (pill 스타일) ── */
 .board-tabs {
     display: flex;
-    gap: 0;
-    background: rgba(255,255,255,0.7);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid rgba(0,0,0,0.08);
-    padding: 0 32px;
+    gap: 4px;
+    align-items: center;
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px;
     position: sticky;
     top: 61px;
     z-index: 90;
@@ -456,36 +497,36 @@ body.dark .board-search-wrap:focus-within {
     flex-direction: column;
     align-items: center;
     gap: 2px;
-    padding: 14px 32px 12px;
-    background: none;
+    padding: 8px 22px;
+    background: transparent;
     border: none;
-    border-bottom: 3px solid transparent;
+    border-radius: var(--radius-full);
     cursor: pointer;
-    font-size: 15px;
-    font-weight: bold;
-    color: #888;
-    transition: color 0.2s, border-color 0.2s;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: color 0.2s, background 0.2s;
     line-height: 1.3;
 }
 
 .board-tab .tab-sub {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: normal;
-    color: #bbb;
+    color: #ccc;
 }
 
 .board-tab.active {
-    color: #5b5ef7;
-    border-bottom-color: #5b5ef7;
+    background: var(--primary);
+    color: #fff;
 }
 
 .board-tab.active .tab-sub {
-    color: #9b9ef7;
+    color: rgba(255,255,255,0.72);
 }
 
 .board-tab:hover:not(.active) {
-    color: #555;
-    background: rgba(0,0,0,0.04);
+    background: var(--primary-light);
+    color: var(--primary);
 }
 
 /* ── 개발 분야 선택 버튼 ── */
@@ -508,11 +549,11 @@ body.dark .board-search-wrap:focus-within {
     padding: 14px 8px;
     background: rgba(0,0,0,0.04);
     border: 2px solid transparent;
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     font-size: 13px;
     font-weight: bold;
-    color: #555;
+    color: var(--text-secondary);
     transition: all 0.18s;
 }
 
@@ -521,15 +562,15 @@ body.dark .board-search-wrap:focus-within {
 }
 
 .dev-field-btn:hover {
-    background: rgba(91,94,247,0.08);
-    border-color: rgba(91,94,247,0.3);
-    color: #5b5ef7;
+    background: var(--primary-light);
+    border-color: var(--primary-muted);
+    color: var(--primary);
 }
 
 .dev-field-btn.active {
-    background: rgba(91,94,247,0.12);
-    border-color: #5b5ef7;
-    color: #5b5ef7;
+    background: var(--primary-hover);
+    border-color: var(--primary);
+    color: var(--primary);
 }
 
 .dev-field-badge {
@@ -558,12 +599,13 @@ body.dark .board-search-wrap:focus-within {
     line-height: 1;
     transition: background 0.15s;
 }
-.count-btn:hover { background: rgba(91,94,247,0.1); border-color:#5b5ef7; color:#5b5ef7; }
-#countDisplay { font-size: 22px; font-weight: 900; color: #5b5ef7; min-width: 28px; text-align: center; }
+.count-btn:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+#countDisplay { font-size: 22px; font-weight: 900; color: var(--primary); min-width: 28px; text-align: center; }
 
 /* ── 팀 카드 ── */
 .card-team {
-    border-top: 3px solid rgba(91,94,247,0.5);
+    align-items: flex-start;
+    border-top: 3px solid var(--primary);
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -588,11 +630,12 @@ body.dark .board-search-wrap:focus-within {
 }
 .team-desc {
     font-size: 13px;
-    color: #666;
+    color: var(--text-secondary);
     line-height: 1.5;
     background: rgba(0,0,0,0.03);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     padding: 8px 10px;
+    width: 100%;
 }
 .team-members-label {
     display: flex;
@@ -604,10 +647,11 @@ body.dark .board-search-wrap:focus-within {
 }
 .team-member-count {
     font-size: 12px;
-    background: rgba(91,94,247,0.1);
-    color: #5b5ef7;
+    background: var(--primary-light);
+    color: var(--primary);
     padding: 2px 10px;
-    border-radius: 20px;
+    border-radius: var(--radius-full);
+    font-weight: 600;
 }
 .team-member-slots {
     display: flex;
@@ -647,34 +691,34 @@ body.dark .board-search-wrap:focus-within {
     width: 100%;
     padding: 10px;
     border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #5b5ef7, #8b8ef7);
+    border-radius: var(--radius-md);
+    background: var(--primary);
     color: #fff;
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 700;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, background 0.2s;
 }
-.team-join-btn:hover { opacity: 0.85; }
-.team-actions { display: flex; gap: 8px; margin-top: auto; }
+.team-join-btn:hover { opacity: 0.88; }
+.team-actions { display: flex; gap: 8px; margin-top: auto; width: 100%; }
 .team-leave-btn {
     padding: 9px 14px;
-    border: 1.5px solid #e0a020;
-    border-radius: 12px;
-    background: rgba(224,160,32,0.08);
-    color: #c8891a;
+    border: 1.5px solid var(--warning);
+    border-radius: var(--radius-md);
+    background: var(--warning-light);
+    color: var(--warning);
     font-size: 13px;
-    font-weight: bold;
+    font-weight: 700;
     cursor: pointer;
     transition: background 0.2s;
     white-space: nowrap;
 }
-.team-leave-btn:hover { background: rgba(224,160,32,0.18); }
-body.dark .team-leave-btn { border-color: rgba(224,160,32,0.5); color: #e0c060; background: rgba(224,160,32,0.08); }
+.team-leave-btn:hover { background: rgba(212, 136, 10, 0.18); }
+body.dark .team-leave-btn { border-color: rgba(212,136,10,0.5); color: #e0c060; background: var(--warning-light); }
 .team-card-img-wrap {
     width: 100%;
-    height: 100px;
-    border-radius: 12px;
+    height: 96px;
+    border-radius: var(--radius-md);
     overflow: hidden;
     margin-bottom: 4px;
 }
@@ -703,17 +747,17 @@ body.dark .team-field-select-btn.active { background: #667eea; border-color: #66
 .team-manage-btn {
     flex: 1;
     padding: 9px;
-    border: 1.5px solid #5b5ef7;
-    border-radius: 12px;
-    background: rgba(91,94,247,0.08);
-    color: #5b5ef7;
+    border: 1.5px solid var(--primary);
+    border-radius: var(--radius-md);
+    background: var(--primary-light);
+    color: var(--primary);
     font-size: 13px;
-    font-weight: bold;
+    font-weight: 700;
     cursor: pointer;
     transition: background 0.2s;
     position: relative;
 }
-.team-manage-btn:hover { background: rgba(91,94,247,0.16); }
+.team-manage-btn:hover { background: var(--primary-hover); }
 .pending-badge {
     display: inline-block;
     background: #e05555;
@@ -746,21 +790,21 @@ body.dark .team-field-select-btn.active { background: #667eea; border-color: #66
 .pending-accept {
     padding: 6px 16px;
     border: none;
-    border-radius: 10px;
-    background: rgba(39,174,96,0.12);
-    color: #27ae60;
+    border-radius: var(--radius-sm);
+    background: var(--success-light);
+    color: var(--success);
     font-weight: bold;
     font-size: 13px;
     cursor: pointer;
     transition: background 0.2s;
 }
-.pending-accept:hover { background: rgba(39,174,96,0.24); }
+.pending-accept:hover { background: rgba(39,174,96,0.22); }
 .pending-reject {
     padding: 6px 16px;
     border: none;
-    border-radius: 10px;
-    background: rgba(224,85,85,0.1);
-    color: #e05555;
+    border-radius: var(--radius-sm);
+    background: var(--danger-light);
+    color: var(--danger);
     font-weight: bold;
     font-size: 13px;
     cursor: pointer;
@@ -810,13 +854,13 @@ body.dark .team-field-select-btn.active { background: #667eea; border-color: #66
 }
 
 .profile-major-badge {
-    background: rgba(102, 126, 234, 0.1);
-    border: 1px solid rgba(102, 126, 234, 0.35);
-    color: #5a4fcf;
+    background: var(--primary-light);
+    border: 1px solid rgba(91, 94, 247, 0.3);
+    color: var(--primary);
     font-size: 12px;
     font-weight: bold;
     padding: 4px 14px;
-    border-radius: 20px;
+    border-radius: var(--radius-full);
 }
 
 .bio-textarea {
@@ -1169,12 +1213,12 @@ body.dark .team-field-select-btn.active { background: #667eea; border-color: #66
 .btn-submit {
     width: 100%;
     padding: 13px;
-    background: linear-gradient(135deg, rgb(143, 203, 255), rgb(100, 170, 240));
+    background: var(--primary);
     color: white;
     font-size: 15px;
     font-weight: bold;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: opacity 0.2s, transform 0.1s;
 }
@@ -1447,23 +1491,26 @@ body.dark .welcome {
 }
 body.dark .site-logo { color: #9b9ef7; }
 body.dark .logout-btn {
-    background-color: rgba(143, 203, 255, 0.2);
-    color: #aad4f5;
+    background: rgba(91,94,247,0.2);
+    color: #9b9ef7;
 }
 body.dark .board-tabs {
     background: rgba(30, 30, 50, 0.9);
     border-bottom-color: rgba(255,255,255,0.08);
 }
 body.dark .board-tab {
-    color: #aaa;
+    color: #888;
 }
 body.dark .board-tab.active {
-    background: rgba(91,94,247,0.18);
-    color: #9b9ef7;
-    border-bottom-color: #9b9ef7;
+    background: rgba(91,94,247,0.85);
+    color: #fff;
+}
+body.dark .board-tab.active .tab-sub {
+    color: rgba(255,255,255,0.65);
 }
 body.dark .board-tab:hover:not(.active) {
-    background: rgba(255,255,255,0.05);
+    background: rgba(91,94,247,0.15);
+    color: #9b9ef7;
 }
 body.dark .section-header h2 { color: #ddd; }
 body.dark .section-header p  { color: #888; }

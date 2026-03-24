@@ -230,10 +230,8 @@
     </div>
 
     <script>
-        // 서버에서 미리 조회한 초기 데이터 → JS API 호출 없이 즉시 렌더링
-        window.__INIT_PROFILES__   = {{ init_profiles | safe }};
-        window.__INIT_TEAMS__      = {{ init_teams | safe }};
-        window.__INIT_TEAM_CHATS__ = {{ init_team_chats | safe }};
+        // 구인 탭만 SSR, 팀 탭·팀채팅은 첫 클릭 시 API 호출 (Lazy)
+        window.__INIT_PROFILES__ = {{ init_profiles | safe }};
     </script>
     <script src="/static/js/dm.js"></script>
     <script src="/static/js/recruit.js"></script>

@@ -955,19 +955,17 @@ def recruit():
     current_user = session['user_id']
     nickname = session.get('nickname', current_user)
 
-    # 초기 데이터를 서버에서 미리 조회 → JS API 호출 왕복 제거
-    init_profiles, init_teams = [], []
+    # ① 기본 탭(구인글)만 SSR — 세션 1개, 쿼리 3개
+    # ② Team/TeamMember/GroupMessage 는 Lazy (탭 클릭 시 API 호출)
+    init_profiles = []
     try:
         with Session(engine) as db_session:
-            profiles   = db_session.exec(select(Profile).where(Profile.post_type == 'recruit').order_by(Profile.created_at)).all()
-            teams      = db_session.exec(select(Team).order_by(Team.created_at)).all()
-            users      = db_session.exec(select(User)).all()
-            interests  = db_session.exec(select(RecruitInterest).where(RecruitInterest.sender_id == current_user)).all()
-            members_all = db_session.exec(select(TeamMember)).all()
+            profiles  = db_session.exec(select(Profile).where(Profile.post_type == 'recruit').order_by(Profile.created_at)).all()
+            users     = db_session.exec(select(User)).all()
+            interests = db_session.exec(select(RecruitInterest).where(RecruitInterest.sender_id == current_user)).all()
 
         nick_map = {u.username: (u.nickname or u.username) for u in users}
         sent_set = {i.profile_id for i in interests}
-
         mine, others = [], []
         for p in profiles:
             row = {
@@ -983,70 +981,13 @@ def recruit():
             }
             (mine if p.user_id == current_user else others).append(row)
         init_profiles = mine + others
-
-        mem_map = {}
-        for m in members_all:
-            mem_map.setdefault(m.team_id, []).append(m)
-        for t in teams:
-            mems     = mem_map.get(t.id, [])
-            accepted = [m for m in mems if m.status == 'accepted']
-            pending  = [m for m in mems if m.status == 'pending']
-            my_status = next((m.status for m in mems if m.user_id == current_user), None)
-            init_teams.append({
-                "id": t.id, "name": t.name, "description": t.description,
-                "dev_field": t.dev_field, "max_members": t.max_members,
-                "team_image": t.team_image, "leader_id": t.leader_id,
-                "leader_name": nick_map.get(t.leader_id, t.leader_name),
-                "is_mine": t.leader_id == current_user, "my_status": my_status,
-                "members":      [{"id": m.id, "user_id": m.user_id, "display_name": nick_map.get(m.user_id, m.display_name), "status": m.status} for m in accepted],
-                "pending_count": len(pending),
-                "pending_list":  [{"id": m.id, "user_id": m.user_id, "display_name": nick_map.get(m.user_id, m.display_name)} for m in pending] if t.leader_id == current_user else [],
-            })
-
-        # 팀 채팅: 내가 속한 팀(팀장 or 승인 멤버)의 메시지 사전 조회
-        my_team_ids = {
-            t.id for t in teams
-            if t.leader_id == current_user
-            or any(m.user_id == current_user and m.status == 'accepted' for m in mem_map.get(t.id, []))
-        }
-        with Session(engine) as db_session:
-            group_msgs_all = db_session.exec(
-                select(GroupMessage)
-                .where(GroupMessage.team_id.in_(my_team_ids))
-                .order_by(GroupMessage.created_at)
-            ).all() if my_team_ids else []
-
-        # { teamId: { team_name, members, messages } }
-        init_team_chats = {}
-        for t_row in init_teams:
-            tid = t_row["id"]
-            if tid not in my_team_ids:
-                continue
-            leader_display = t_row["leader_name"] + " 👑"
-            members_data = [{"user_id": t_row["leader_id"], "display_name": leader_display}] + [
-                {"user_id": m["user_id"], "display_name": nick_map.get(m["user_id"], m["display_name"])}
-                for m in t_row["members"]
-            ]
-            init_team_chats[tid] = {
-                "team_name": t_row["name"],
-                "members":   members_data,
-                "messages":  [
-                    {"id": gm.id, "sender_id": gm.sender_id,
-                     "sender_nickname": gm.sender_nickname,
-                     "message": gm.message, "created_at": gm.created_at,
-                     "is_mine": gm.sender_id == current_user}
-                    for gm in group_msgs_all if gm.team_id == tid
-                ],
-            }
     except Exception:
-        pass  # 실패 시 빈 데이터로 시작, JS가 API로 재시도
+        pass
 
     return render_template(
         'recruit.html',
         user_id=nickname, is_admin=check_admin(), raw_user_id=current_user,
         init_profiles=json.dumps(init_profiles, ensure_ascii=False),
-        init_teams=json.dumps(init_teams, ensure_ascii=False),
-        init_team_chats=json.dumps(init_team_chats, ensure_ascii=False),
     )
 
 

@@ -4,6 +4,27 @@
     box-sizing: border-box;
 }
 
+/* ── Lucide 아이콘 ── */
+.li {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    flex-shrink: 0;
+    line-height: 1;
+}
+.li svg {
+    width: 1em;
+    height: 1em;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.darkmode-btn .li svg { width: 20px; height: 20px; }
+.site-logo .li svg    { width: 18px; height: 18px; }
+.settings-btn .li svg { width: 14px; height: 14px; }
+
 body {
     background:
         radial-gradient(ellipse 80% 60% at 15% 20%, rgba(255, 150, 220, 0.7) 0%, transparent 65%),

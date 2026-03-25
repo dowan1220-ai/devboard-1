@@ -1,5 +1,40 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* ── Lucide 아이콘 ── */
+.li {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    flex-shrink: 0;
+    line-height: 1;
+}
+.li svg {
+    width: 1em;
+    height: 1em;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.dm-topbar-btn .li svg,
+.bell-btn .li svg,
+.darkmode-btn .li svg  { width: 20px; height: 20px; }
+.dm-send-btn .li svg   { width: 17px; height: 17px; }
+.dm-back-btn .li svg   { width: 20px; height: 20px; }
+.admin-logo .li svg    { width: 18px; height: 18px; }
+.sidebar-icon .li svg  { width: 18px; height: 18px; }
+.tab-title .li svg     { width: 18px; height: 18px; }
+.btn-neutral .li svg,
+.btn-danger .li svg,
+.btn-warn .li svg,
+.btn-success .li svg   { width: 14px; height: 14px; }
+.notice-pin-icon .li svg { width: 16px; height: 16px; }
+.status-badge .li svg,
+.admin-badge-cell .li svg { width: 13px; height: 13px; }
+.member-card-locked .li svg { width: 13px; height: 13px; }
+.member-dm-hint .li svg { width: 13px; height: 13px; }
+
 body {
     font-family: sans-serif;
     background: #f4f6fb;

@@ -1,3 +1,37 @@
+/* ── Lucide 아이콘 공통 (notif.css가 포함된 모든 페이지에 적용) ── */
+.li {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    flex-shrink: 0;
+    line-height: 1;
+}
+.li svg {
+    width: 1em;
+    height: 1em;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+/* 버튼별 아이콘 크기 */
+.dm-topbar-btn .li svg,
+.bell-btn .li svg,
+.darkmode-btn .li svg { width: 20px; height: 20px; }
+.dm-send-btn .li svg  { width: 17px; height: 17px; }
+.dm-back-btn .li svg  { width: 20px; height: 20px; }
+.site-logo .li svg    { width: 18px; height: 18px; }
+.admin-link-btn .li svg,
+.settings-btn .li svg,
+.logout-btn .li svg   { width: 14px; height: 14px; }
+.nav-btn .li svg      { width: 28px; height: 28px; }
+.stat-label .li svg   { width: 14px; height: 14px; }
+.notif-panel-icon .li svg { width: 20px; height: 20px; }
+.board-tab .li svg    { width: 1.1em; height: 1.1em; }
+.intro-img-placeholder .li svg { width: 48px; height: 48px; stroke-width: 1.5; }
+.profile-dm-btn .li svg { width: 16px; height: 16px; }
+
 /* ── 페이지 진입 애니메이션 ── */
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(-12px); }

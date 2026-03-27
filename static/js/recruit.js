@@ -445,7 +445,7 @@ document.getElementById('teamForm').addEventListener('submit', async e => {
         const method = isEditing ? 'PUT' : 'POST';
         const res = await fetch(url, {method, body:fd});
         const data = await res.json();
-        if (data.success) { closeTeamModal(); loadProfiles(); }
+        if (data.success) { closeTeamModal(); location.reload(); }
         else errorEl.textContent = data.error || '오류가 발생했습니다.';
     } catch { errorEl.textContent = '오류가 발생했습니다.'; }
     finally { btn.disabled = false; btn.textContent = isEditing ? '수정하기' : '팀 만들기'; }
@@ -687,7 +687,7 @@ function createTeamCard(team) {
             if (!confirm('팀을 삭제할까요?')) return;
             const res = await fetch(`/api/teams/${team.id}`, {method:'DELETE'});
             const data = await res.json();
-            if (data.success) loadProfiles(); else alert(data.error || '삭제 실패');
+            if (data.success) location.reload(); else alert(data.error || '삭제 실패');
         });
     }
     const manageBtn = card.querySelector('.team-manage-btn');

@@ -620,17 +620,23 @@ body.dark .board-search-icon { color: rgba(255,255,255,0.6); }
     margin-top: 8px;
 }
 .count-btn {
-    width: 32px; height: 32px;
+    width: 36px; height: 36px;
     border-radius: 50%;
-    border: 1.5px solid #ddd;
-    background: none;
-    font-size: 18px;
+    border: 2px solid var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 20px;
+    font-weight: 700;
     cursor: pointer;
     line-height: 1;
-    transition: background 0.15s;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, transform 0.1s;
 }
-.count-btn:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
-#countDisplay { font-size: 22px; font-weight: 900; color: var(--primary); min-width: 28px; text-align: center; }
+.count-btn:hover { background: var(--primary); color: #fff; transform: scale(1.1); }
+.count-btn:active { transform: scale(0.95); }
+#countDisplay { font-size: 24px; font-weight: 900; color: var(--primary); min-width: 32px; text-align: center; }
+body.dark .count-btn { background: rgba(91,94,247,0.15); border-color: var(--primary); color: #9b9ef7; }
+body.dark .count-btn:hover { background: var(--primary); color: #fff; }
 
 /* ── 팀 카드 ── */
 .card-team {

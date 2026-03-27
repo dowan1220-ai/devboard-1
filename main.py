@@ -939,6 +939,7 @@ def user_profile(target_username):
                 "current_languages": [l.strip() for l in p.current_languages.split(',') if l.strip()],
                 "profile_image": p.profile_image,
                 "post_type": p.post_type,
+                "dev_field": p.dev_field or '',
             })
 
         team_list = []

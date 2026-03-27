@@ -1359,21 +1359,27 @@ def recruit_interest(profile_id):
             created_at=time.time()
         )
         db_session.add(interest)
-        notif = Notification(
-            user_id=profile.user_id,
-            sender_id=current_user,
-            sender_nickname=nickname,
-            profile_id=profile_id,
-            profile_name=profile.name,
-            is_read=False,
-            created_at=time.time()
-        )
-        db_session.add(notif)
         try:
-            db_session.commit()
+            db_session.commit()  # 구인 신청 먼저 저장
         except Exception as e:
             db_session.rollback()
             return {"error": "신청 처리 중 오류가 발생했습니다."}, 500
+        # 알림 저장 (실패해도 신청은 유지)
+        try:
+            notif = Notification(
+                user_id=profile.user_id,
+                sender_id=current_user,
+                sender_nickname=nickname,
+                profile_id=profile_id,
+                profile_name=profile.name or '',
+                notif_type='interest',
+                is_read=False,
+                created_at=time.time()
+            )
+            db_session.add(notif)
+            db_session.commit()
+        except Exception:
+            db_session.rollback()
     return {"success": True}
 
 

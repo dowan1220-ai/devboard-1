@@ -331,7 +331,7 @@ body {
 
 /* ── 다크모드 전체 ── */
 body.dark { background: #1a1a2e; color: #e0e0e0; }
-body.dark .admin-topbar { background: rgba(30,30,50,0.97); border-bottom: 1px solid rgba(255,255,255,0.07); }
+body.dark .admin-topbar { background: linear-gradient(135deg, #0f0f26 0%, #131330 100%); border-bottom: 2px solid rgba(91, 94, 247, 0.5); box-shadow: 0 4px 28px rgba(0,0,0,0.7), 0 1px 0 rgba(91,94,247,0.2); }
 body.dark .admin-logo { color: #9b9ef7; }
 body.dark .admin-badge { background: linear-gradient(135deg, #4a4dd4, #7b7ef0); }
 body.dark .admin-user { color: #aaa; }

@@ -541,6 +541,8 @@ body.dark .footer {
     color: white;
     text-shadow: 0 1px 4px rgba(0,0,0,0.3);
     padding-bottom: 60px;
+    position: relative;
+    z-index: 1;
 }
 
 /* 푸터 스페이서 */
@@ -645,6 +647,151 @@ body.dark .footer {
 .nav-btn span:first-child {
     font-size: 48px;
 }
+
+/* ── 홈 2×2 그리드 ── */
+.home-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 28px;
+    position: relative;
+    z-index: 1;
+}
+
+.home-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(14px);
+    padding: 36px 48px;
+    border-radius: 24px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 17px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    cursor: pointer;
+}
+
+.home-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 36px rgba(0,0,0,0.18);
+}
+
+.home-card-icon {
+    font-size: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.home-card-icon .li svg { width: 44px; height: 44px; stroke: #5b5ef7; }
+
+.home-card-label {
+    font-size: 16px;
+    color: #444;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.home-card-stat .home-card-label .li svg { width: 15px; height: 15px; }
+
+.home-card-num {
+    font-size: 42px;
+    font-weight: 900;
+    color: #5b5ef7;
+}
+
+body.dark .home-card {
+    background: rgba(255,255,255,0.07);
+    color: #ddd;
+}
+body.dark .home-card-label { color: #ccc; }
+body.dark .home-card-num { color: #9b9ef7; }
+body.dark .home-card-icon .li svg { stroke: #9b9ef7; }
+
+/* ── 플로팅 배경 카드 ── */
+.floating-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.float-card {
+    position: absolute;
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(4px);
+    border-radius: 16px;
+    padding: 16px 20px;
+    width: 180px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    filter: blur(0.5px);
+    opacity: 0.65;
+}
+
+.fc-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.fc-dot {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+.fc-purple { background: linear-gradient(135deg,#7c6ff7,#b39ddb); }
+.fc-orange { background: linear-gradient(135deg,#f7a35c,#f7c67e); }
+.fc-blue   { background: linear-gradient(135deg,#5b9ef7,#93c5fd); }
+.fc-green  { background: linear-gradient(135deg,#43d08a,#86efac); }
+
+.fc-title { font-size: 12px; font-weight: 700; color: #555; }
+.fc-value { font-size: 22px; font-weight: 900; color: #333; margin-bottom: 4px; }
+.fc-trend { font-size: 10px; color: #43d08a; font-weight: 600; }
+
+/* 각 카드 위치 & 애니메이션 */
+.fc1 { top: 10%; left: -2%; transform: rotate(-12deg); animation: fcFloat1 10s ease-in-out infinite; }
+.fc2 { top: 5%;  right: 2%; transform: rotate(8deg);  animation: fcFloat2 13s ease-in-out infinite; }
+.fc3 { top: 45%; left: 3%; transform: rotate(-7deg);  animation: fcFloat3 11s ease-in-out infinite; }
+.fc4 { top: 55%; right: 0%; transform: rotate(10deg); animation: fcFloat4 14s ease-in-out infinite; }
+.fc5 { top: 78%; left: 18%; transform: rotate(-5deg); animation: fcFloat5 9s  ease-in-out infinite; }
+.fc6 { top: 72%; right: 15%;transform: rotate(6deg);  animation: fcFloat6 12s ease-in-out infinite; }
+
+@keyframes fcFloat1 {
+    0%,100% { transform: rotate(-12deg) translate(0,0); }
+    50%      { transform: rotate(-9deg)  translate(18px,-22px); }
+}
+@keyframes fcFloat2 {
+    0%,100% { transform: rotate(8deg) translate(0,0); }
+    50%      { transform: rotate(5deg) translate(-20px,18px); }
+}
+@keyframes fcFloat3 {
+    0%,100% { transform: rotate(-7deg) translate(0,0); }
+    50%      { transform: rotate(-4deg) translate(22px,-16px); }
+}
+@keyframes fcFloat4 {
+    0%,100% { transform: rotate(10deg) translate(0,0); }
+    50%      { transform: rotate(7deg)  translate(-16px,20px); }
+}
+@keyframes fcFloat5 {
+    0%,100% { transform: rotate(-5deg) translate(0,0); }
+    50%      { transform: rotate(-8deg) translate(14px,-18px); }
+}
+@keyframes fcFloat6 {
+    0%,100% { transform: rotate(6deg) translate(0,0); }
+    50%      { transform: rotate(3deg) translate(-18px,14px); }
+}
+
+/* 다크모드: 플로팅 카드 숨김 */
+body.dark .floating-bg { display: none; }
 
 /* ── 관리자 링크 버튼 ── */
 .admin-link-btn {

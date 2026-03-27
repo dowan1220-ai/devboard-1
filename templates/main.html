@@ -50,28 +50,60 @@
         </div>
     </div>
 
+    <!-- 플로팅 배경 카드 (라이트모드에서만 표시) -->
+    <div class="floating-bg">
+        <div class="float-card fc1">
+            <div class="fc-header"><span class="fc-dot fc-purple"></span><span class="fc-title">Performance</span></div>
+            <div class="fc-value">49.65%</div>
+            <div class="fc-trend">↑ 1.20% since last year</div>
+        </div>
+        <div class="float-card fc2">
+            <div class="fc-header"><span class="fc-dot fc-orange"></span><span class="fc-title">Messages</span></div>
+            <div class="fc-value">220</div>
+            <div class="fc-trend">↑ 3.40% since last month</div>
+        </div>
+        <div class="float-card fc3">
+            <div class="fc-header"><span class="fc-dot fc-blue"></span><span class="fc-title">Current Jobs</span></div>
+            <div class="fc-value">160</div>
+            <div class="fc-trend">↑ 0.80% since last week</div>
+        </div>
+        <div class="float-card fc4">
+            <div class="fc-header"><span class="fc-dot fc-green"></span><span class="fc-title">Members</span></div>
+            <div class="fc-value">38</div>
+            <div class="fc-trend">↑ 5.10% since last month</div>
+        </div>
+        <div class="float-card fc5">
+            <div class="fc-header"><span class="fc-dot fc-purple"></span><span class="fc-title">Performance</span></div>
+            <div class="fc-value">49.65%</div>
+            <div class="fc-trend">↑ 1.20% since last year</div>
+        </div>
+        <div class="float-card fc6">
+            <div class="fc-header"><span class="fc-dot fc-orange"></span><span class="fc-title">Messages</span></div>
+            <div class="fc-value">220</div>
+            <div class="fc-trend">↑ 3.40% since last month</div>
+        </div>
+    </div>
+
     <div class="content">
         <h1 class="typing-text fade-up" id="typingText" style="--fu-delay:0.08s"></h1>
-        <div class="nav-menu">
-            <a href="/recruit" class="nav-btn fade-up" id="btnRecruit" style="--fu-delay:0.18s">
-                <span><i data-lucide="users" class="li"></i></span>
-                <span>구인 게시판</span>
+        <div class="home-grid">
+            <a href="/recruit" class="home-card fade-up" id="btnRecruit" style="--fu-delay:0.18s">
+                <span class="home-card-icon"><i data-lucide="users" class="li"></i></span>
+                <span class="home-card-label">구인 게시판</span>
                 <span class="nav-btn-new hidden" id="btnDotRecruit">NEW</span>
             </a>
-            <a href="/notice" class="nav-btn fade-up" id="btnNotice" style="--fu-delay:0.24s">
-                <span><i data-lucide="clipboard-list" class="li"></i></span>
-                <span>공지사항</span>
+            <a href="/notice" class="home-card fade-up" id="btnNotice" style="--fu-delay:0.24s">
+                <span class="home-card-icon"><i data-lucide="clipboard-list" class="li"></i></span>
+                <span class="home-card-label">공지사항</span>
                 <span class="nav-btn-new hidden" id="btnDotNotice">NEW</span>
             </a>
-        </div>
-        <div class="stats-section">
-            <a href="/members" class="stat-card fade-up" style="text-decoration:none; --fu-delay:0.32s">
-                <span class="stat-num" id="statUsers">-</span>
-                <span class="stat-label"><i data-lucide="users" class="li"></i> 가입자</span>
+            <a href="/members" class="home-card home-card-stat fade-up" style="--fu-delay:0.32s">
+                <span class="home-card-num" id="statUsers">-</span>
+                <span class="home-card-label"><i data-lucide="users" class="li"></i> 가입자</span>
             </a>
-            <div class="stat-card fade-up" style="--fu-delay:0.38s">
-                <span class="stat-num" id="statProfiles">-</span>
-                <span class="stat-label"><i data-lucide="search" class="li"></i> 구인 등록</span>
+            <div class="home-card home-card-stat fade-up" style="--fu-delay:0.38s">
+                <span class="home-card-num" id="statProfiles">-</span>
+                <span class="home-card-label"><i data-lucide="search" class="li"></i> 구인 등록</span>
             </div>
         </div>
     </div>

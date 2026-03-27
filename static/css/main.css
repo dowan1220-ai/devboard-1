@@ -4,6 +4,8 @@
     box-sizing: border-box;
 }
 
+.hidden { display: none !important; }
+
 body {
     background:
         radial-gradient(ellipse 80% 60% at 15% 20%, rgba(255, 150, 220, 0.7) 0%, transparent 65%),

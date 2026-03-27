@@ -758,36 +758,50 @@ body.dark .home-card-icon .li svg { stroke: #9b9ef7; }
 .fc-trend { font-size: 10px; color: #43d08a; font-weight: 600; }
 
 /* 각 카드 위치 & 애니메이션 */
-.fc1 { top: 10%; left: -2%; transform: rotate(-12deg); animation: fcFloat1 10s ease-in-out infinite; }
-.fc2 { top: 5%;  right: 2%; transform: rotate(8deg);  animation: fcFloat2 13s ease-in-out infinite; }
-.fc3 { top: 45%; left: 3%; transform: rotate(-7deg);  animation: fcFloat3 11s ease-in-out infinite; }
-.fc4 { top: 55%; right: 0%; transform: rotate(10deg); animation: fcFloat4 14s ease-in-out infinite; }
-.fc5 { top: 78%; left: 18%; transform: rotate(-5deg); animation: fcFloat5 9s  ease-in-out infinite; }
-.fc6 { top: 72%; right: 15%;transform: rotate(6deg);  animation: fcFloat6 12s ease-in-out infinite; }
+.fc1 { top: 8%;  left: -3%;  animation: fcFloat1 7s  ease-in-out infinite; }
+.fc2 { top: 3%;  right: 1%;  animation: fcFloat2 9s  ease-in-out infinite; animation-delay: -2s; }
+.fc3 { top: 42%; left: 2%;   animation: fcFloat3 8s  ease-in-out infinite; animation-delay: -1s; }
+.fc4 { top: 50%; right: -1%; animation: fcFloat4 10s ease-in-out infinite; animation-delay: -3s; }
+.fc5 { top: 76%; left: 15%;  animation: fcFloat5 6s  ease-in-out infinite; animation-delay: -4s; }
+.fc6 { top: 70%; right: 12%; animation: fcFloat6 8s  ease-in-out infinite; animation-delay: -1.5s; }
 
 @keyframes fcFloat1 {
-    0%,100% { transform: rotate(-12deg) translate(0,0); }
-    50%      { transform: rotate(-9deg)  translate(18px,-22px); }
+    0%   { transform: rotate(-12deg) translate(0, 0)      scale(1); }
+    25%  { transform: rotate(-6deg)  translate(28px,-36px) scale(1.04); }
+    50%  { transform: rotate(-15deg) translate(14px,-20px) scale(0.97); }
+    75%  { transform: rotate(-8deg)  translate(-10px,-30px) scale(1.02); }
+    100% { transform: rotate(-12deg) translate(0, 0)      scale(1); }
 }
 @keyframes fcFloat2 {
-    0%,100% { transform: rotate(8deg) translate(0,0); }
-    50%      { transform: rotate(5deg) translate(-20px,18px); }
+    0%   { transform: rotate(8deg)  translate(0, 0)       scale(1); }
+    25%  { transform: rotate(14deg) translate(-32px,24px)  scale(1.03); }
+    50%  { transform: rotate(4deg)  translate(-18px,38px)  scale(0.96); }
+    75%  { transform: rotate(11deg) translate(12px, 28px)  scale(1.05); }
+    100% { transform: rotate(8deg)  translate(0, 0)       scale(1); }
 }
 @keyframes fcFloat3 {
-    0%,100% { transform: rotate(-7deg) translate(0,0); }
-    50%      { transform: rotate(-4deg) translate(22px,-16px); }
+    0%   { transform: rotate(-7deg) translate(0, 0)       scale(1); }
+    30%  { transform: rotate(-2deg) translate(36px,-28px)  scale(1.04); }
+    60%  { transform: rotate(-10deg)translate(20px, 16px)  scale(0.97); }
+    100% { transform: rotate(-7deg) translate(0, 0)       scale(1); }
 }
 @keyframes fcFloat4 {
-    0%,100% { transform: rotate(10deg) translate(0,0); }
-    50%      { transform: rotate(7deg)  translate(-16px,20px); }
+    0%   { transform: rotate(10deg) translate(0, 0)        scale(1); }
+    35%  { transform: rotate(16deg) translate(-28px, 32px) scale(1.05); }
+    65%  { transform: rotate(6deg)  translate(-36px,-14px) scale(0.96); }
+    100% { transform: rotate(10deg) translate(0, 0)        scale(1); }
 }
 @keyframes fcFloat5 {
-    0%,100% { transform: rotate(-5deg) translate(0,0); }
-    50%      { transform: rotate(-8deg) translate(14px,-18px); }
+    0%   { transform: rotate(-5deg) translate(0, 0)        scale(1); }
+    40%  { transform: rotate(-12deg)translate(24px,-34px)  scale(1.06); }
+    70%  { transform: rotate(-2deg) translate(10px,-18px)  scale(0.95); }
+    100% { transform: rotate(-5deg) translate(0, 0)        scale(1); }
 }
 @keyframes fcFloat6 {
-    0%,100% { transform: rotate(6deg) translate(0,0); }
-    50%      { transform: rotate(3deg) translate(-18px,14px); }
+    0%   { transform: rotate(6deg)  translate(0, 0)        scale(1); }
+    30%  { transform: rotate(12deg) translate(-30px, 26px) scale(1.04); }
+    60%  { transform: rotate(2deg)  translate(-14px, 38px) scale(0.97); }
+    100% { transform: rotate(6deg)  translate(0, 0)        scale(1); }
 }
 
 /* 다크모드: 플로팅 카드 숨김 */

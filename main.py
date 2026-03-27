@@ -1060,54 +1060,62 @@ def create_profile():
     if 'user_id' not in session:
         return {"error": "Unauthorized"}, 401
     current_user = session['user_id']
-    with Session(engine) as db_session:
-        post_type = request.form.get('post_type', 'recruit').strip()
-        existing = db_session.exec(
-            select(Profile).where(Profile.user_id == current_user, Profile.post_type == post_type)
-        ).first()
-        if existing:
-            return {"error": "이미 해당 유형의 프로필이 등록되어 있습니다."}, 400
-        name = session.get('nickname', current_user)
-        class_number = request.form.get('class_number', '').strip()
-        major = request.form.get('major', '').strip()
-        bio = request.form.get('bio', '').strip()
-        past_languages = request.form.get('past_languages', '').strip()
-        current_languages = request.form.get('current_languages', '').strip()
-        profile_image = request.form.get('profile_image', '').strip()
-        dev_field = request.form.get('dev_field', '').strip() or None
-        if not class_number or not major:
-            return {"error": "반/번호, 전공은 필수입니다."}, 400
-        if post_type == 'job_seek' and not dev_field:
-            return {"error": "개발 분야를 선택해주세요."}, 400
-        profile = Profile(
-            user_id=current_user,
-            name=name,
-            bio=bio,
-            class_number=class_number,
-            major=major,
-            past_languages=past_languages,
-            current_languages=current_languages,
-            profile_image=profile_image if profile_image else None,
-            post_type=post_type,
-            dev_field=dev_field,
-            created_at=time.time()
-        )
-        db_session.add(profile)
-        db_session.commit()
-        db_session.refresh(profile)
-        return {
-            "success": True,
-            "profile": {
-                "id": profile.id,
-                "name": profile.name,
-                "class_number": profile.class_number,
-                "major": profile.major,
-                "past_languages": [l.strip() for l in profile.past_languages.split(',') if l.strip()],
-                "current_languages": [l.strip() for l in profile.current_languages.split(',') if l.strip()],
-                "profile_image": profile.profile_image,
-                "is_mine": True
+    post_type = request.form.get('post_type', 'recruit').strip()
+    name = session.get('nickname', current_user)
+    class_number = request.form.get('class_number', '').strip()
+    major = request.form.get('major', '').strip()
+    bio = request.form.get('bio', '').strip()
+    past_languages = request.form.get('past_languages', '').strip()
+    current_languages = request.form.get('current_languages', '').strip()
+    profile_image = request.form.get('profile_image', '').strip() or None
+    dev_field = request.form.get('dev_field', '').strip() or None
+    if not class_number or not major:
+        return {"error": "반/번호, 전공은 필수입니다."}, 400
+    if post_type == 'job_seek' and not dev_field:
+        return {"error": "개발 분야를 선택해주세요."}, 400
+    try:
+        with Session(engine) as db_session:
+            existing = db_session.exec(
+                select(Profile).where(Profile.user_id == current_user, Profile.post_type == post_type)
+            ).first()
+            if existing:
+                return {"error": "이미 해당 유형의 프로필이 등록되어 있습니다."}, 400
+            profile = Profile(
+                user_id=current_user,
+                name=name,
+                bio=bio,
+                class_number=class_number,
+                major=major,
+                past_languages=past_languages,
+                current_languages=current_languages,
+                profile_image=profile_image,
+                post_type=post_type,
+                dev_field=dev_field,
+                created_at=time.time()
+            )
+            db_session.add(profile)
+            db_session.commit()
+            db_session.refresh(profile)
+            return {
+                "success": True,
+                "profile": {
+                    "id": profile.id,
+                    "name": profile.name,
+                    "class_number": profile.class_number,
+                    "major": profile.major,
+                    "bio": profile.bio or '',
+                    "dev_field": profile.dev_field or '',
+                    "post_type": profile.post_type,
+                    "past_languages": [l.strip() for l in profile.past_languages.split(',') if l.strip()],
+                    "current_languages": [l.strip() for l in profile.current_languages.split(',') if l.strip()],
+                    "profile_image": profile.profile_image,
+                    "is_mine": True,
+                    "interest_sent": False,
+                    "owner_id": current_user,
+                }
             }
-        }
+    except Exception as e:
+        return {"error": "프로필 등록 중 오류가 발생했습니다. 다시 시도해주세요."}, 500
 
 
 # ───────────── 팀 게시판 ─────────────
